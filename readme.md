@@ -1,5 +1,6 @@
 # Discord Bot
 
+This is old project and its still work in progess, but will be updated.
 A Discord bot that provides various utilities including air pollution data and New York Times articles.
 
 ## Setup
