@@ -1,7 +1,7 @@
-# Discord Bot
+# Discord Bot for general use for myself
 
-This is old project and its still work in progess, but will be updated.
-A Discord bot that provides various utilities including air pollution data and New York Times articles.
+This is old project and its still work in progess, but will be updated in near future.
+A Discord bot in Java that provides various utilities including air pollution data and New York Times articles.
 
 ## Setup
 
