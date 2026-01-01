@@ -8,4 +8,8 @@ class EchoCommand(Command):
         self.echo_service = EchoService()
 
     async def execute(self, message, args):
-        await message.channel.send(self.echo_service.build_echo_text(args))
+        text = self.echo_service.build_echo_text(args)
+        if text is None:
+            await message.channel.send("Musisz podać tekst do echo")
+            return
+        await message.channel.send(text)
