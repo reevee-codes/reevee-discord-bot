@@ -1,6 +1,8 @@
 import discord
 import os
 from dotenv import load_dotenv
+
+from commands.fact import FactCommand
 from commands.ping import PingCommand
 from commands.echo import EchoCommand
 from commands.quote import QuoteCommand
@@ -10,7 +12,7 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents=intents)
-commands = [PingCommand(), EchoCommand(), QuoteCommand()]
+commands = [PingCommand(), EchoCommand(), QuoteCommand(), FactCommand()]
 
 @client.event
 async def on_ready():
