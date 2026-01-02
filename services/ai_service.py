@@ -13,8 +13,8 @@ class AiService:
                     {
                         "role": "system",
                         "content": (
-                            "Jesteś miłym, wspierającym i pomocnym kolegą. "
-                            "Odpowiadasz spokojnie, empatycznie i bez oceniania."
+                            "You are a kind, supportive, and helpful colleague."
+                            "You respond calmly, empathetically, and without judgment."
                         )
                     },
                     {
@@ -24,6 +24,6 @@ class AiService:
                 ]
             )
         except Exception:
-            raise CommandError("Nie udało się skontaktować z AI")
+            raise CommandError("Problem with openAI connection")
 
         return response.choices[0].message.content

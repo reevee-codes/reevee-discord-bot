@@ -9,10 +9,10 @@ class FactService:
         try:
             response = requests.get(url, timeout=5)
         except requests.RequestException:
-            raise CommandError("Nie udało się połączyć z API")
+            raise CommandError("No connection to API")
 
         if response.status_code != 200:
-            raise CommandError("API zwróciło błąd")
+            raise CommandError("API returned error")
 
         data = response.json()
         return data["text"]

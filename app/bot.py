@@ -2,6 +2,7 @@ import discord
 import os
 from dotenv import load_dotenv
 
+from commands.chat import ChatCommand
 from commands.fact import FactCommand
 from commands.ping import PingCommand
 from commands.echo import EchoCommand
@@ -12,11 +13,11 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents=intents)
-commands = [PingCommand(), EchoCommand(), QuoteCommand(), FactCommand()]
+commands = [PingCommand(), EchoCommand(), QuoteCommand(), FactCommand(), ChatCommand()]
 
 @client.event
 async def on_ready():
-    print("Discord bot started running!")
+    print("Discord bot started running.")
 
 @client.event
 async def on_message(message):

@@ -1,6 +1,5 @@
 from errors.command_error import CommandError
 
-
 class EchoService:
 
     def build_echo_text(self, args):
