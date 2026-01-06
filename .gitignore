@@ -73,3 +73,9 @@ coverage.xml
 
 # Windows
 Thumbs.db
+build/
+dist/
+*.egg-info/
+__pycache__/
+.venv/
+.venv-test/
