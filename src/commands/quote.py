@@ -1,5 +1,5 @@
-from commands.base import Command
-from services.quote_service import QuoteService
+from src.commands.base import Command
+from src.services.quote_service import QuoteService
 
 class QuoteCommand(Command):
     trigger = "!quote"

@@ -1,6 +1,6 @@
-from commands.base import Command
-from errors.command_error import CommandError
-from services.echo_service import EchoService
+from src.commands.base import Command
+from src.errors.command_error import CommandError
+from src.services.echo_service import EchoService
 
 class EchoCommand(Command):
     trigger = "!echo"

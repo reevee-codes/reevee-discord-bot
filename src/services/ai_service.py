@@ -1,5 +1,5 @@
 from openai import AsyncOpenAI
-from errors.command_error import CommandError
+from src.errors.command_error import CommandError
 
 class AiService:
     def __init__(self):

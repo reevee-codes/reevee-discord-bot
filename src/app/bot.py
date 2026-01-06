@@ -2,11 +2,11 @@ import discord
 import os
 from dotenv import load_dotenv
 
-from commands.chat import ChatCommand
-from commands.fact import FactCommand
-from commands.ping import PingCommand
-from commands.echo import EchoCommand
-from commands.quote import QuoteCommand
+from src.commands.chat import ChatCommand
+from src.commands.fact import FactCommand
+from src.commands.ping import PingCommand
+from src.commands.echo import EchoCommand
+from src.commands.quote import QuoteCommand
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")

@@ -1,6 +1,6 @@
-from commands.base import Command
-from errors.command_error import CommandError
-from services.fact_service import FactService
+from src.commands.base import Command
+from src.errors.command_error import CommandError
+from src.services.fact_service import FactService
 
 class FactCommand(Command):
     trigger = "!fact"

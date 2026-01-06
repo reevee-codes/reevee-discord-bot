@@ -1,6 +1,6 @@
-from commands.base import Command
-from errors.command_error import CommandError
-from services.ai_service import AiService
+from src.commands.base import Command
+from src.errors.command_error import CommandError
+from src.services.ai_service import AiService
 
 class ChatCommand(Command):
     trigger = "!chat"

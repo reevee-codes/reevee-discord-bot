@@ -1,4 +1,4 @@
-from services.quotes_data import QUOTES
+from src.services.quotes_data import QUOTES
 import random
 
 class QuoteService:

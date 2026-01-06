@@ -1,4 +1,4 @@
-from errors.command_error import CommandError
+from src.errors.command_error import CommandError
 
 class EchoService:
 
