@@ -32,4 +32,4 @@ A modular Discord bot written in Python.
 
 ---
 
-Simple. Modular. Ready for your Discord server :)
+Simple. Modular. Ready for your Discord server :)!
