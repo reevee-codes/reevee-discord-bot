@@ -1,29 +1,74 @@
 from openai import AsyncOpenAI
-from src.errors.command_error import CommandError
+
 
 class AiService:
     def __init__(self):
         self.client = AsyncOpenAI()
+        self.memory = {}
+        self.facts = {}
 
-    async def ask(self, user_message: str) -> str:
-        try:
-            response = await self.client.chat.completions.create(
-                model="gpt-4.1-mini",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": (
-                            "You are a kind, supportive, and helpful colleague."
-                            "You respond calmly, empathetically, and without judgment."
-                        )
-                    },
-                    {
-                        "role": "user",
-                        "content": user_message
-                    }
-                ]
-            )
-        except Exception:
-            raise CommandError("Problem with openAI connection")
+    async def ask(self, user_id: int, user_message: str) -> str:
+        history = self.memory.get(user_id, [])
+        facts = self.facts.get(user_id, [])
+        facts_block = "\n".join(f"- {fact}" for fact in facts)
 
-        return response.choices[0].message.content
+        messages = [
+            {
+                "role": "system",
+                "content": (
+                    "Jesteś miłym, wspierającym i pomocnym kolegą.\n"
+                    "Poniżej znajdują się ZNANE FAKTY o użytkowniku.\n"
+                    "Traktuj je jako prawdziwe i używaj ich w odpowiedziach.\n\n"
+                    f"{facts_block if facts_block else 'Brak zapisanych faktów.'}"
+                )
+            },
+            *history,
+            {
+                "role": "user",
+                "content": user_message
+            }
+        ]
+
+        response = await self.client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=messages
+        )
+
+        reply = response.choices[0].message.content
+
+        facts = await self.extract_facts(user_message)
+        if facts:
+            self.facts.setdefault(user_id, []).extend(facts)
+
+        self.memory[user_id] = (
+                history
+                + [{"role": "user", "content": user_message},
+                   {"role": "assistant", "content": reply}]
+        )[-10:]
+
+        return reply
+
+    async def extract_facts(self, text: str) -> list[str]:
+        response = await self.client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "Wyciągnij z tekstu trwałe fakty o użytkowniku. "
+                        "Zwróć listę krótkich zdań albo pustą listę. "
+                        "Nie wymyślaj nic"
+                    )
+                },
+                {
+                    "role": "user",
+                    "content": text
+                }
+            ]
+        )
+        raw = response.choices[0].message.content.strip()
+
+        if not raw:
+            return []
+
+        return [line.strip("-• ") for line in raw.split("\n") if line.strip()]

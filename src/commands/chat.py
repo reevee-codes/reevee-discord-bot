@@ -11,7 +11,10 @@ class ChatCommand(Command):
     async def execute(self, message, args):
         user_text = " ".join(args)
         try:
-            reply = await self.ai_service.ask(user_text)
+            user_id = message.author.id
+            reply = await self.ai_service.ask(user_id, user_text)
+            if not reply or not reply.strip():
+                reply = "Jestem tu 🙂 Możesz powiedzieć trochę więcej?"
             await message.channel.send(reply)
         except CommandError as e:
             await message.channel.send(str(e))
