@@ -1,13 +1,15 @@
 from openai import AsyncOpenAI
-
+from src.infra.rate_limiter import RateLimiter
 
 class AiService:
     def __init__(self):
         self.client = AsyncOpenAI()
         self.memory = {}
         self.facts = {}
+        self.rate_limiter = RateLimiter(max_calls = 5, window_seconds = 60)
 
     async def ask(self, user_id: int, user_message: str) -> str:
+        self.rate_limiter.check(user_id)
         history = self.memory.get(user_id, [])
         facts = self.facts.get(user_id, [])
         facts_block = "\n".join(f"- {fact}" for fact in facts)
