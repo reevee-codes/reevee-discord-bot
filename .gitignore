@@ -67,6 +67,7 @@ coverage.xml
 # PyCharm
 .idea/
 *.iml
+PROJECT_STATUS.md
 
 # macOS
 .DS_Store
