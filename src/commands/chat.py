@@ -1,6 +1,7 @@
 from src.commands.base import Command
 from src.errors.command_error import CommandError
 from src.services.ai_service import AiService
+import time
 
 class ChatCommand(Command):
     trigger = "!chat"
@@ -9,10 +10,14 @@ class ChatCommand(Command):
         self.ai_service = ai_service
 
     async def execute(self, message, args):
+        start = time.perf_counter()
+
         user_text = " ".join(args)
         try:
             user_id = message.author.id
             reply = await self.ai_service.ask(user_id, user_text)
+            elapsed = time.perf_counter() - start
+            print(f"AI response time: {elapsed:.2f}s")
             if not reply or not reply.strip():
                 reply = "Jestem tu 🙂 Możesz powiedzieć trochę więcej?"
             await message.channel.send(reply)
