@@ -5,8 +5,8 @@ from src.services.ai_service import AiService
 class ChatCommand(Command):
     trigger = "!chat"
 
-    def __init__(self):
-        self.ai_service = AiService()
+    def __init__(self, ai_service: AiService):
+        self.ai_service = ai_service
 
     async def execute(self, message, args):
         user_text = " ".join(args)

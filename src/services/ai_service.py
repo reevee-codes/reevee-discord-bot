@@ -74,3 +74,6 @@ class AiService:
             return []
 
         return [line.strip("-• ") for line in raw.split("\n") if line.strip()]
+
+    def get_facts(self, user_id: int) -> list[str]:
+        return self.facts.get(user_id, [])

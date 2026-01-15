@@ -4,16 +4,20 @@ from dotenv import load_dotenv
 
 from src.commands.chat import ChatCommand
 from src.commands.fact import FactCommand
+from src.commands.facts import FactsCommand
 from src.commands.ping import PingCommand
 from src.commands.echo import EchoCommand
 from src.commands.quote import QuoteCommand
+from src.services.ai_service import AiService
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents=intents)
-commands = [PingCommand(), EchoCommand(), QuoteCommand(), FactCommand(), ChatCommand()]
+ai_service = AiService()
+commands = [PingCommand(), EchoCommand(), QuoteCommand(), FactCommand(), ChatCommand(ai_service),
+            FactsCommand(ai_service)]
 
 @client.event
 async def on_ready():
