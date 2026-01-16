@@ -77,3 +77,6 @@ class AiService:
 
     def get_facts(self, user_id: int) -> list[str]:
         return self.facts.get(user_id, [])
+
+    def _normalize_fact(self, fact: str) -> str:
+        return fact.strip().lower()
