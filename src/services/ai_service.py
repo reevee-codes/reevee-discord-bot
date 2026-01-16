@@ -5,7 +5,7 @@ class AiService:
     def __init__(self):
         self.client = AsyncOpenAI()
         self.memory = {}
-        self.facts = {}
+        self.facts: dict[int, dict[str, str]] = {}
         self.rate_limiter = RateLimiter(max_calls = 5, window_seconds = 60)
 
     async def ask(self, user_id: int, user_message: str) -> str:
