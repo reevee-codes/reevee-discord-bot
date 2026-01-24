@@ -1,6 +1,6 @@
+import re
 from openai import AsyncOpenAI
 from src.infra.rate_limiter import RateLimiter
-
 
 class AiService:
     def __init__(self):
@@ -45,15 +45,16 @@ class AiService:
             user_facts = self.facts.setdefault(user_id, {})
 
             for fact in extracted_facts:
-                key = self._normalize_fact(fact)
-                user_facts[key] = fact
+                clean_fact = self._clean_fact(fact)
+                signature = self._fact_signature(clean_fact)
+                user_facts[signature] = clean_fact
 
         self.memory[user_id] = (
-            history
-            + [
-                {"role": "user", "content": user_message},
-                {"role": "assistant", "content": reply}
-            ]
+                history
+                + [
+                    {"role": "user", "content": user_message},
+                    {"role": "assistant", "content": reply}
+                ]
         )[-10:]
 
         return reply
@@ -93,3 +94,23 @@ class AiService:
 
     def _normalize_fact(self, fact: str) -> str:
         return fact.strip().lower()
+
+    def _fact_signature(self, fact: str) -> str:
+        """
+        Changes all numbers to placeholder
+        'Użytkownik ma 23 lata.' -> 'użytkownik ma _ lata.'
+        """
+        fact = fact.lower()
+        fact = re.sub(r"\d+", "_", fact)
+        return fact
+
+    def _clean_fact(self, fact: str) -> str:
+        fact = fact.strip()
+
+        if fact.startswith("[") and fact.endswith("]"):
+            fact = fact.strip("[]").strip()
+
+        if fact.startswith('"') and fact.endswith('"'):
+            fact = fact.strip('"')
+
+        return fact
