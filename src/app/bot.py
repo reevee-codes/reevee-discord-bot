@@ -10,6 +10,7 @@ from src.commands.echo import EchoCommand
 from src.commands.quote import QuoteCommand
 from src.commands.reset import ResetCommand
 from src.commands.weather import WeatherCommand
+from src.memory.sqlite_memory_store import SqliteMemoryStore
 from src.services.ai_service import AiService
 from src.services.weather_service import WeatherService
 
@@ -18,10 +19,12 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents=intents)
-ai_service = AiService()
+
+memory_store = SqliteMemoryStore()
+ai_service = AiService(memory_store)
 weather_service = WeatherService()
 commands = [PingCommand(), EchoCommand(), QuoteCommand(), FactCommand(), ChatCommand(ai_service),
-            FactsCommand(ai_service), WeatherCommand(weather_service),
+            FactsCommand(memory_store), WeatherCommand(weather_service),
             ResetCommand(ai_service)]
 
 @client.event

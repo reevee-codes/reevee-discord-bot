@@ -1,21 +1,23 @@
 import re
 from openai import AsyncOpenAI
 from src.infra.rate_limiter import RateLimiter
+from src.memory.memory_store import MemoryStore
+
 
 class AiService:
-    def __init__(self):
+    def __init__(self, memory_store: MemoryStore):
         self.client = AsyncOpenAI()
         self.rate_limiter = RateLimiter(max_calls=5, window_seconds=60)
-        self.memory: dict[int, list[dict]] = {}
-        self.facts: dict[int, dict[str, str]] = {}
+        self.memory_store = memory_store
+        self.conversation_memory: dict[int, list[dict]] = {}
 
     async def ask(self, user_id: int, user_message: str) -> str:
         self.rate_limiter.check(user_id)
+        history = self.conversation_memory.get(user_id, [])
+        user_facts = self.memory_store.get_facts(user_id)
 
-        history = self.memory.get(user_id, [])
-
-        user_facts = self.facts.get(user_id, {})
         facts_block = "\n".join(f"- {fact}" for fact in user_facts.values())
+
         messages = [
             {
                 "role": "system",
@@ -32,7 +34,6 @@ class AiService:
                 "content": user_message
             }
         ]
-
         response = await self.client.chat.completions.create(
             model="gpt-4.1-mini",
             messages=messages
@@ -42,19 +43,21 @@ class AiService:
 
         extracted_facts = await self.extract_facts(user_message)
         if extracted_facts:
-            user_facts = self.facts.setdefault(user_id, {})
+            updated_facts = dict(user_facts)
 
             for fact in extracted_facts:
                 clean_fact = self._clean_fact(fact)
                 signature = self._fact_signature(clean_fact)
-                user_facts[signature] = clean_fact
+                updated_facts[signature] = clean_fact  # last-write-wins
 
-        self.memory[user_id] = (
-                history
-                + [
-                    {"role": "user", "content": user_message},
-                    {"role": "assistant", "content": reply}
-                ]
+            self.memory_store.save_facts(user_id, updated_facts)
+
+        self.conversation_memory[user_id] = (
+            history
+            + [
+                {"role": "user", "content": user_message},
+                {"role": "assistant", "content": reply}
+            ]
         )[-10:]
 
         return reply
@@ -85,26 +88,22 @@ class AiService:
 
         return [line.strip("-• ").strip() for line in raw.split("\n") if line.strip()]
 
-    def get_facts(self, user_id: int) -> list[str]:
-        return list(self.facts.get(user_id, {}).values())
-
     def reset_user(self, user_id: int) -> None:
-        self.memory.pop(user_id, None)
-        self.facts.pop(user_id, None)
-
-    def _normalize_fact(self, fact: str) -> str:
-        return fact.strip().lower()
+        self.conversation_memory.pop(user_id, None)
+        self.memory_store.reset_user(user_id)
 
     def _fact_signature(self, fact: str) -> str:
         """
-        Changes all numbers to placeholder
+        Normalizuje fakt do logicznego klucza:
         'Użytkownik ma 23 lata.' -> 'użytkownik ma _ lata.'
         """
         fact = fact.lower()
-        fact = re.sub(r"\d+", "_", fact)
-        return fact
+        return re.sub(r"\d+", "_", fact)
 
     def _clean_fact(self, fact: str) -> str:
+        """
+        Czyści noisy output LLM (listy, cudzysłowy itp.)
+        """
         fact = fact.strip()
 
         if fact.startswith("[") and fact.endswith("]"):
