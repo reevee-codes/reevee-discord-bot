@@ -8,6 +8,7 @@ from src.commands.facts import FactsCommand
 from src.commands.ping import PingCommand
 from src.commands.echo import EchoCommand
 from src.commands.quote import QuoteCommand
+from src.commands.reset import ResetCommand
 from src.commands.weather import WeatherCommand
 from src.services.ai_service import AiService
 from src.services.weather_service import WeatherService
@@ -20,7 +21,8 @@ client = discord.Client(intents=intents)
 ai_service = AiService()
 weather_service = WeatherService()
 commands = [PingCommand(), EchoCommand(), QuoteCommand(), FactCommand(), ChatCommand(ai_service),
-            FactsCommand(ai_service), WeatherCommand(weather_service)]
+            FactsCommand(ai_service), WeatherCommand(weather_service),
+            ResetCommand(ai_service)]
 
 @client.event
 async def on_ready():
