@@ -13,7 +13,7 @@ class AiService:
 
     async def ask(self, user_id: int, user_message: str) -> str:
         self.rate_limiter.check(user_id)
-        history = self.conversation_memory.get(user_id, [])
+        history = self.memory_store.get_conversation(user_id)
         user_facts = self.memory_store.get_facts(user_id)
 
         facts_block = "\n".join(f"- {fact}" for fact in user_facts.values())
@@ -52,14 +52,13 @@ class AiService:
 
             self.memory_store.save_facts(user_id, updated_facts)
 
-        self.conversation_memory[user_id] = (
-            history
-            + [
+        self.memory_store.save_conversation(
+            user_id,
+            [
                 {"role": "user", "content": user_message},
                 {"role": "assistant", "content": reply}
             ]
-        )[-10:]
-
+        )
         return reply
 
     async def extract_facts(self, text: str) -> list[str]:

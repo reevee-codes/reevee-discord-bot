@@ -1,7 +1,7 @@
 import sqlite3
 from typing import Dict
 from src.memory.memory_store import MemoryStore
-
+import time
 
 class SqliteMemoryStore(MemoryStore):
     def __init__(self, db_path: str = "memory.db"):
@@ -18,6 +18,16 @@ class SqliteMemoryStore(MemoryStore):
                 signature TEXT,
                 value TEXT,
                 PRIMARY KEY (user_id, signature)
+            )
+            """
+        )
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS conversation (
+                user_id INTEGER,
+                role TEXT,
+                content TEXT,
+                created_at INTEGER
             )
             """
         )
@@ -49,15 +59,35 @@ class SqliteMemoryStore(MemoryStore):
 
     def reset_user(self, user_id: int) -> None:
         cursor = self.conn.cursor()
-        cursor.execute(
-            "DELETE FROM facts WHERE user_id = ?",
-            (user_id,)
-        )
+        cursor.execute("DELETE FROM facts WHERE user_id = ?", (user_id,))
+        cursor.execute("DELETE FROM conversation WHERE user_id = ?", (user_id,))
         self.conn.commit()
 
-
-    def get_conversation(self, user_id: int):
-        raise NotImplementedError()
+    def get_conversation(self, user_id: int, limit: int = 10):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """
+            SELECT role, content
+            FROM conversation
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+            LIMIT ?
+            """,
+            (user_id, limit)
+        )
+        rows = cursor.fetchall()
+        rows.reverse()
+        return [{"role": row["role"], "content": row["content"]} for row in rows]
 
     def save_conversation(self, user_id: int, messages):
-        raise NotImplementedError()
+        cursor = self.conn.cursor()
+        timestamp = int(time.time())
+        for message in messages:
+            cursor.execute(
+                """
+                INSERT INTO conversation (user_id, role, content, created_at)
+                VALUES (?, ?, ?, ?)
+                """,
+                (user_id, message["role"], message["content"], timestamp)
+            )
+        self.conn.commit()
