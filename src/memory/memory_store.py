@@ -22,3 +22,7 @@ class MemoryStore(ABC):
     @abstractmethod
     def reset_user(self, user_id: int) -> None:
         pass
+
+    @abstractmethod
+    def get_todo(self, user_id: int) -> List[str]:
+        pass

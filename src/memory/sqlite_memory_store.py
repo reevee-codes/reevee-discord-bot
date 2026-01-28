@@ -1,5 +1,5 @@
 import sqlite3
-from typing import Dict
+from typing import Dict, List
 from src.memory.memory_store import MemoryStore
 import time
 
@@ -28,6 +28,15 @@ class SqliteMemoryStore(MemoryStore):
                 role TEXT,
                 content TEXT,
                 created_at INTEGER
+            )
+            """
+        )
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS todo (
+                user_id INTEGER,
+                item TEXT,
+                PRIMARY KEY (user_id, item)
             )
             """
         )
@@ -61,6 +70,7 @@ class SqliteMemoryStore(MemoryStore):
         cursor = self.conn.cursor()
         cursor.execute("DELETE FROM facts WHERE user_id = ?", (user_id,))
         cursor.execute("DELETE FROM conversation WHERE user_id = ?", (user_id,))
+        cursor.execute("DELETE FROM todo WHERE user_id = ?", (user_id,))
         self.conn.commit()
 
     def get_conversation(self, user_id: int, limit: int = 10):
@@ -91,3 +101,27 @@ class SqliteMemoryStore(MemoryStore):
                 (user_id, message["role"], message["content"], timestamp)
             )
         self.conn.commit()
+
+    def get_todo(self, user_id: int) -> List[str]:
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "SELECT item FROM todo WHERE user_id = ?",
+            (user_id,)
+        )
+        rows = cursor.fetchall()
+        return [row["item"] for row in rows]
+
+    def save_todo(self, user_id: int, items: List[str]) -> None:
+        cursor = self.conn.cursor()
+
+        for item in items:
+            cursor.execute(
+                """
+                INSERT OR REPLACE INTO todo (user_id, item)
+                VALUES (?, ?)
+                """,
+                (user_id, item)
+            )
+
+        self.conn.commit()
+

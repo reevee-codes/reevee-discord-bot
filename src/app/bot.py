@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from src.commands.chat import ChatCommand
 from src.commands.fact import FactCommand
 from src.commands.facts import FactsCommand
+from src.commands.get_todo import TodoCommand
 from src.commands.ping import PingCommand
 from src.commands.echo import EchoCommand
 from src.commands.quote import QuoteCommand
@@ -25,7 +26,7 @@ ai_service = AiService(memory_store)
 weather_service = WeatherService()
 commands = [PingCommand(), EchoCommand(), QuoteCommand(), FactCommand(), ChatCommand(ai_service),
             FactsCommand(memory_store), WeatherCommand(weather_service),
-            ResetCommand(ai_service)]
+            ResetCommand(ai_service), TodoCommand(memory_store)]
 
 @client.event
 async def on_ready():
