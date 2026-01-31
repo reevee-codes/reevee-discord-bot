@@ -8,10 +8,10 @@ class AddTodoCommand(Command):
 
     async def execute(self, message, args):
         user_id = message.author.id
-        item = args.strip()
+        item = " ".join(args).strip()
         todo = self.memory_store.add_todo(user_id, item)
 
-        if not todo:
+        if not item:
             await message.channel.send("Musisz coś wpisać, żeby dało się to dodać do todo!")
             return
 

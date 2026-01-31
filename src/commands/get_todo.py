@@ -1,7 +1,7 @@
 from src.commands.base import Command
 
 class GetTodoCommand(Command):
-    trigger = "!todo"
+    trigger = "!get_todo"
 
     def __init__(self, memory_store):
         self.memory_store = memory_store
@@ -14,5 +14,5 @@ class GetTodoCommand(Command):
             await message.channel.send("Na razie nie masz nic w todo!")
             return
 
-        lines = "\n".join(f"• {x}" for x in todo.values())
+        lines = "\n".join(f"• {x}" for x in todo)
         await message.channel.send(f"Masz do roboty:\n{lines}")
