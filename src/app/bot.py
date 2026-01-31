@@ -2,10 +2,11 @@ import discord
 import os
 from dotenv import load_dotenv
 
+from src.commands.add_todo import AddTodoCommand
 from src.commands.chat import ChatCommand
 from src.commands.fact import FactCommand
 from src.commands.facts import FactsCommand
-from src.commands.get_todo import TodoCommand
+from src.commands.get_todo import GetTodoCommand
 from src.commands.ping import PingCommand
 from src.commands.echo import EchoCommand
 from src.commands.quote import QuoteCommand
@@ -26,7 +27,8 @@ ai_service = AiService(memory_store)
 weather_service = WeatherService()
 commands = [PingCommand(), EchoCommand(), QuoteCommand(), FactCommand(), ChatCommand(ai_service),
             FactsCommand(memory_store), WeatherCommand(weather_service),
-            ResetCommand(ai_service), TodoCommand(memory_store)]
+            ResetCommand(ai_service), GetTodoCommand(memory_store),
+            AddTodoCommand(memory_store)]
 
 @client.event
 async def on_ready():

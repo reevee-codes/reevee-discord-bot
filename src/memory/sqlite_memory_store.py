@@ -111,17 +111,14 @@ class SqliteMemoryStore(MemoryStore):
         rows = cursor.fetchall()
         return [row["item"] for row in rows]
 
-    def save_todo(self, user_id: int, items: List[str]) -> None:
+    def add_todo(self, user_id: int, item: str) -> None:
         cursor = self.conn.cursor()
-
-        for item in items:
-            cursor.execute(
+        cursor.execute(
                 """
                 INSERT OR REPLACE INTO todo (user_id, item)
                 VALUES (?, ?)
                 """,
                 (user_id, item)
             )
-
         self.conn.commit()
 

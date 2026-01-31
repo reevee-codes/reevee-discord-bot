@@ -1,6 +1,6 @@
 from src.commands.base import Command
 
-class TodoCommand(Command):
+class GetTodoCommand(Command):
     trigger = "!todo"
 
     def __init__(self, memory_store):

@@ -26,3 +26,7 @@ class MemoryStore(ABC):
     @abstractmethod
     def get_todo(self, user_id: int) -> List[str]:
         pass
+
+    @abstractmethod
+    def add_todo(self, user_id: int, item: str) -> None:
+        pass
