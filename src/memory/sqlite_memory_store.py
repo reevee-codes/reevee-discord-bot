@@ -80,13 +80,12 @@ class SqliteMemoryStore(MemoryStore):
             SELECT role, content
             FROM conversation
             WHERE user_id = ?
-            ORDER BY created_at DESC
-            LIMIT ?
+            ORDER BY created_at ASC
             """,
-            (user_id, limit)
+            (user_id,)
         )
         rows = cursor.fetchall()
-        rows.reverse()
+        rows = rows[-limit:]
         return [{"role": row["role"], "content": row["content"]} for row in rows]
 
     def save_conversation(self, user_id: int, messages):
@@ -111,7 +110,7 @@ class SqliteMemoryStore(MemoryStore):
         rows = cursor.fetchall()
         return [row["item"] for row in rows]
 
-    def add_todo(self, user_id: int, item: str) -> None:
+    def add_todo(self, user_id: int, item: str) -> str:
         cursor = self.conn.cursor()
         cursor.execute(
                 """
