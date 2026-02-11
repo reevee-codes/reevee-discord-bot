@@ -1,6 +1,6 @@
 # Discord Bot Python
 
-A simple, extensible Discord bot written in Python.
+A simple, extensible Discord bot written in Python
 
 ## Features
 - Ready-to-use commands:
